@@ -26,6 +26,9 @@ jobs:
         - os-name: Linux-aarch64
           runs-on: ubuntu-24.04-arm
           target: aarch64-unknown-linux-gnu
+        - os-name: macOS-aarch64
+          runs-on: macos-latest
+          target: aarch64-apple-darwin
 'on':
   pull_request: {}
   push: {}
