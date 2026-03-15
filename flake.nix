@@ -12,6 +12,7 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+    nix-actions.url = "github:koskev/nix-actions";
     import-tree.url = "github:vic/import-tree";
   };
 
