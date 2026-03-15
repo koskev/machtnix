@@ -13,29 +13,10 @@
         name = "machtnix";
         src = self;
         nativeBuildInputs = with pkgs; [
-          cargo
-          gdb
-          cargo-tarpaulin
-          clippy
-          rustfmt
-          cargo2junit
-
-          rust-analyzer
-          bacon
-          tracy
-          reuse
-
-          conform
-          prek
-          gnumake
-          git-cliff
           pkg-config
-
         ];
         buildInputs = with pkgs; [
-          rustc
           nix
-          boost
           stdenv.cc.libc.dev
         ];
         RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
