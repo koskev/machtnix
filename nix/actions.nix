@@ -192,7 +192,7 @@ in
             strategy.matrix.platform = [
               platforms.linux
               platforms.linux_aarch64
-              #platforms.mac
+              platforms.mac
             ];
             runs-on = "\${{ matrix.platform.runs-on }}";
             steps = [
