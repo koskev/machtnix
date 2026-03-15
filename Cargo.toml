@@ -1,0 +1,25 @@
+[package]
+name = "machtnix"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+nix-bindings-store = { git = "https://github.com/nixops4/nix-bindings-rust" }
+nix-bindings-expr = { git = "https://github.com/nixops4/nix-bindings-rust" }
+nix-bindings-flake = { git = "https://github.com/nixops4/nix-bindings-rust" }
+nix-bindings-util = { git = "https://github.com/nixops4/nix-bindings-rust" }
+nix-bindings-fetchers = { git = "https://github.com/nixops4/nix-bindings-rust" }
+language-server = { git = "https://github.com/koskev/grustonnet-ls"}
+utils = { git = "https://github.com/koskev/grustonnet-ls"}
+jsonnet-location = { git = "https://github.com/koskev/grustonnet-ls"}
+node-stack = { git = "https://github.com/koskev/grustonnet-ls"}
+anyhow = "1.0.102"
+tree-sitter = "0.26.0"
+tree-sitter-nix = "0.3.0"
+lsp-server = "0.7.8"
+lsp-types = { version = "0.97.0", features = ["proposed"] }
+env_logger = "0.11.9"
+log = "0.4.29"
+rnix = "0.14.0"
+rowan = "0.16.1"
+ropey = "1.6.1"
