@@ -36,14 +36,28 @@ impl Completion for NixCompletion {
         uri: &lsp_types::Uri,
     ) -> language_server::completion::CompletionResult {
         let doc = self.cache.get_document(uri)?;
-        let mut pos: Location = location.into();
-        // TODO: use cst to get the actual position
-        pos.column -= 1;
+        let pos: Location = location.into();
         let tree = new_tree(&doc.content).ok_or(anyhow!("Unable to generate tree"))?;
         let root_node = tree.root_node();
-        let node = root_node
+        let mut node = root_node
             .get_node_at(pos.into())
             .ok_or(anyhow!("Unable to find node"))?;
+        // If dot, Identifier, or Attrpath -> Skip to next Identifier or Attrpath to skip the
+        // currently selected one
+        match NodeType::from(node) {
+            NodeType::Identifier | NodeType::Dot | NodeType::Attrpath => {
+                node = get_prev_node(node).ok_or(anyhow!("No parent left"))?;
+                // Now get the next Identifier
+                while NodeType::from(node) != NodeType::Identifier {
+                    node = get_prev_node(node).ok_or(anyhow!("No parent left"))?;
+                    log::trace!(
+                        "Searching for Identifier or path: parent is of type {}",
+                        node.grammar_name()
+                    );
+                }
+            }
+            _ => (),
+        };
 
         let mut names: Vec<String> = vec![];
         names.push(
