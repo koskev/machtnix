@@ -56,6 +56,7 @@ impl From<SyntaxNode> for NixASTNode {
     }
 }
 
+#[allow(dead_code)]
 impl NixASTNode {
     fn get_location(&self, content: &str) -> Option<LocationRange> {
         let node = self.get_node();
