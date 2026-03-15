@@ -13,8 +13,9 @@ use language_server::{
     utils::{UriHelper, rope::RopeHelper},
 };
 use lsp_types::{
-    CompletionOptions, CompletionParams, CompletionResponse, InitializeParams, ServerCapabilities,
-    TextDocumentSyncCapability, TextDocumentSyncKind, TextDocumentSyncOptions, Uri,
+    CompletionOptions, CompletionParams, CompletionResponse, DidSaveTextDocumentParams,
+    InitializeParams, ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind,
+    TextDocumentSyncOptions, Uri,
 };
 use rnix::{NixLanguage, SyntaxNode};
 use rowan::{GreenNode, ast::SyntaxNodePtr};
@@ -189,5 +190,12 @@ impl LSPServer for NixLSPServer {
         )?;
 
         Ok(CompletionResponse::List(list).into())
+    }
+
+    fn did_save(&self, _params: DidSaveTextDocumentParams) -> Result<(), LSPError> {
+        if let Some(flake_cache) = &self.flake_cache {
+            flake_cache.write_or_panic().refresh_flake()?
+        }
+        Ok(())
     }
 }

@@ -613,7 +613,7 @@ checksum = "0cc23270f6e1808e30a928bdc84dea0b9b4136a8bc82338574f23baf47bbd280"
 [[package]]
 name = "grustonnet-config"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#9937a84ae786705bb7918d2f567142c86aaa6582"
+source = "git+https://github.com/koskev/grustonnet-ls#043f18b11b2a03f6edbc91f93f400683bbc667c3"
 dependencies = [
  "lsp-types",
  "schemars 1.2.1",
@@ -911,7 +911,7 @@ dependencies = [
 [[package]]
 name = "jsonnet-bridge"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#9937a84ae786705bb7918d2f567142c86aaa6582"
+source = "git+https://github.com/koskev/grustonnet-ls#043f18b11b2a03f6edbc91f93f400683bbc667c3"
 dependencies = [
  "anyhow",
  "grustonnet-config",
@@ -926,7 +926,7 @@ dependencies = [
 [[package]]
 name = "jsonnet-location"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#9937a84ae786705bb7918d2f567142c86aaa6582"
+source = "git+https://github.com/koskev/grustonnet-ls#043f18b11b2a03f6edbc91f93f400683bbc667c3"
 dependencies = [
  "anyhow",
  "bincode",
@@ -939,7 +939,7 @@ dependencies = [
 [[package]]
 name = "language-server"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#9937a84ae786705bb7918d2f567142c86aaa6582"
+source = "git+https://github.com/koskev/grustonnet-ls#043f18b11b2a03f6edbc91f93f400683bbc667c3"
 dependencies = [
  "anyhow",
  "crossbeam",
@@ -1109,7 +1109,7 @@ dependencies = [
 [[package]]
 name = "name-variant"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#9937a84ae786705bb7918d2f567142c86aaa6582"
+source = "git+https://github.com/koskev/grustonnet-ls#043f18b11b2a03f6edbc91f93f400683bbc667c3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1253,7 +1253,7 @@ dependencies = [
 [[package]]
 name = "node-stack"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#9937a84ae786705bb7918d2f567142c86aaa6582"
+source = "git+https://github.com/koskev/grustonnet-ls#043f18b11b2a03f6edbc91f93f400683bbc667c3"
 dependencies = [
  "bincode",
  "grustonnet-config",
@@ -2039,7 +2039,7 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "utils"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#9937a84ae786705bb7918d2f567142c86aaa6582"
+source = "git+https://github.com/koskev/grustonnet-ls#043f18b11b2a03f6edbc91f93f400683bbc667c3"
 dependencies = [
  "dunce",
 ]
