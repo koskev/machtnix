@@ -88,6 +88,13 @@ impl Completion for NixCompletion {
         let first_name = names.pop().ok_or(anyhow!("empty"))?;
         match first_name.as_str() {
             "inputs" => names.push("inputs".into()),
+            "inputs'" => {
+                names.push("inputs".into());
+                // Map inputs' to inputs.<flake>.<output>.${system}
+                if names.len() >= 3 {
+                    names.insert(names.len() - 3, "x86_64-linux".into());
+                }
+            }
             "self" => (),
             "self'" => {
                 // Map self' to self.<second>.${system}
@@ -95,7 +102,7 @@ impl Completion for NixCompletion {
                     names.insert(names.len() - 1, "x86_64-linux".into());
                 }
             }
-            _ => return Err(anyhow!("Unsupported variable")),
+            _ => return Err(anyhow!("Unsupported variable {}", first_name)),
         };
         names.reverse();
         log::debug!("Getting flake values for {}.{:?}", first_name, names);
