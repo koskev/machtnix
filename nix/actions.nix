@@ -2,6 +2,7 @@
 let
   inherit (inputs.nix-actions.lib) steps;
   inherit (inputs.nix-actions.lib) platforms;
+  inherit (inputs.nix-actions.lib) mkCachixSteps;
 in
 {
   imports = [ inputs.actions-nix.flakeModules.default ];
@@ -39,7 +40,8 @@ in
                 name = "Build";
                 run = "nix build .";
               }
-            ];
+            ]
+            ++ mkCachixSteps { };
           };
         };
       };
