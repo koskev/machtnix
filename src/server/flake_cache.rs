@@ -14,7 +14,7 @@ use utils::{MutexPanic, RwLockPanic};
 
 static INIT: Once = Once::new();
 
-struct SendEval(Mutex<EvalState>);
+pub struct SendEval(Mutex<EvalState>);
 struct SendValue(RwLock<Option<Value>>);
 
 impl Deref for SendEval {
@@ -39,7 +39,7 @@ unsafe impl Sync for SendValue {}
 pub struct FlakeCache {
     _gc_registration: ThreadRegistrationGuard,
 
-    eval_state: Arc<SendEval>,
+    pub eval_state: Arc<SendEval>,
     flake_value: Arc<SendValue>,
     flake_path: String,
 }
