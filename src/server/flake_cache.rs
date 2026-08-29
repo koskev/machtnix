@@ -77,7 +77,12 @@ impl FlakeCache {
         Ok(())
     }
 
-    pub fn get_flake_values(&mut self, attrs: &[String]) -> Result<Vec<String>> {
+    pub fn get_flake_value_name(&mut self, attrs: &[String]) -> Result<Vec<String>> {
+        let val = self.get_flake_value(attrs)?;
+        self.eval_state.lock_or_panic().require_attrs_names(&val)
+    }
+
+    pub fn get_flake_value(&mut self, attrs: &[String]) -> Result<Value> {
         let mut val = self
             .flake_value
             .read_or_panic()
@@ -91,6 +96,6 @@ impl FlakeCache {
                 .require_attrs_select(&val, attr)?;
             log::info!("Got {}", attr);
         }
-        self.eval_state.lock_or_panic().require_attrs_names(&val)
+        Ok(val)
     }
 }

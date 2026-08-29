@@ -205,15 +205,12 @@ impl LSPServer for NixLSPServer {
     fn queue_diagnostics(&self, _uri: &Uri) {}
 
     fn completion(&self, params: CompletionParams) -> Result<LSPResponse, LSPError> {
-        let list = NixCompletion {
-            cache: self.cache.clone(),
-            flake_cache: self.flake_cache.clone().unwrap(),
-        }
-        .complete(&CompletionContext {
-            location: params.text_document_position.position.into(),
-            uri: params.text_document_position.text_document.uri.clone(),
-            encoding: self.get_encoding(),
-        })?;
+        let list = NixCompletion::new(self.cache.clone(), self.flake_cache.clone().unwrap())
+            .complete(&CompletionContext {
+                location: params.text_document_position.position.into(),
+                uri: params.text_document_position.text_document.uri.clone(),
+                encoding: self.get_encoding(),
+            })?;
 
         Ok(CompletionResponse::List(list).into())
     }

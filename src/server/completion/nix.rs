@@ -1,5 +1,5 @@
 use std::{
-    collections::VecDeque,
+    collections::{HashMap, VecDeque},
     sync::{Arc, RwLock},
 };
 
@@ -9,12 +9,16 @@ use language_server::{
     cache::Cache,
     completion::{Completion, CompletionContext},
 };
-use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
+use lsp_types::CompletionList;
 use tree_sitter::Node;
 use utils::cst::CstNodeHelper;
 
 use crate::server::{
     NixASTGenerator,
+    completion::mapping::{
+        NixInputsMapping, NixInputsPrimeMapping, NixLibMapping, NixMapping, NixSelfMapping,
+        NixSelfPrimeMapping, NixpkgMapping,
+    },
     cst::{new_tree, node_type::NodeType},
     flake_cache::FlakeCache,
 };
@@ -22,6 +26,25 @@ use crate::server::{
 pub struct NixCompletion {
     pub cache: Cache<NixASTGenerator>,
     pub flake_cache: Arc<RwLock<FlakeCache>>,
+
+    mappings: HashMap<String, Box<dyn NixMapping>>,
+}
+
+impl NixCompletion {
+    pub fn new(cache: Cache<NixASTGenerator>, flake_cache: Arc<RwLock<FlakeCache>>) -> Self {
+        Self {
+            cache,
+            flake_cache,
+            mappings: HashMap::from([
+                ("pkgs".to_string(), Box::new(NixpkgMapping) as _),
+                ("lib".to_string(), Box::new(NixLibMapping) as _),
+                ("inputs".to_string(), Box::new(NixInputsMapping) as _),
+                ("inputs'".to_string(), Box::new(NixInputsPrimeMapping) as _),
+                ("self".to_string(), Box::new(NixSelfMapping) as _),
+                ("self'".to_string(), Box::new(NixSelfPrimeMapping) as _),
+            ]),
+        }
+    }
 }
 
 // TODO: copied from helper due to lifetime stuff
@@ -93,46 +116,16 @@ impl Completion for NixCompletion {
         }
 
         let first_name = names.pop_front().ok_or(anyhow!("empty"))?;
-        match first_name.as_str() {
-            "lib" => {
-                names.extend(
-                    "inputs.nixpkgs.legacyPackages.x86_64-linux.lib"
-                        .split(".")
-                        .map(|s| s.to_string()),
-                );
-            }
-            "inputs" => names.push_front("inputs".into()),
-            "inputs'" => {
-                names.push_front("inputs".into());
-                // Map inputs' to inputs.<flake>.<output>.${system}
-                if names.len() >= 3 {
-                    names.insert(3, "x86_64-linux".into());
-                }
-            }
-            "self" => (),
-            "self'" => {
-                // Map self' to self.<second>.${system}
-                if !names.is_empty() {
-                    names.insert(1, "x86_64-linux".into());
-                }
-            }
-            _ => return Err(anyhow!("Unsupported variable {}", first_name)),
-        };
+        let mapping = self
+            .mappings
+            .get(&first_name)
+            .ok_or(anyhow!("Unsupported variable {}", first_name))?;
+
+        mapping.map_names(&mut names);
         log::debug!("Getting flake values for {}.{:?}", first_name, names);
 
-        let vals = self
-            .flake_cache
-            .write()
-            .unwrap()
-            .get_flake_values(names.make_contiguous())?;
-        let items = vals
-            .iter()
-            .map(|val| CompletionItem {
-                label: val.to_string(),
-                kind: Some(CompletionItemKind::FIELD),
-                ..Default::default()
-            })
-            .collect();
+        let items = mapping.completion_item(names.make_contiguous(), self.flake_cache.clone())?;
+
         Ok(CompletionList {
             items,
             is_incomplete: false,
