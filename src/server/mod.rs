@@ -160,7 +160,9 @@ impl LSPServer for NixLSPServer {
                 .to_file_path_string()
                 .unwrap();
             log::info!("Loading flake from {}", path);
-            flake_cache.write_or_panic().load_flake(&path).unwrap();
+            if let Err(e) = flake_cache.write_or_panic().load_flake(&path) {
+                log::error!("Unable to load flake. Reloading on next save. Err: {e}");
+            };
         }
     }
 
