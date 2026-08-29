@@ -1,4 +1,7 @@
-use std::sync::{Arc, RwLock};
+use std::{
+    collections::VecDeque,
+    sync::{Arc, RwLock},
+};
 
 use anyhow::anyhow;
 use jsonnet_location::Location;
@@ -59,8 +62,8 @@ impl Completion for NixCompletion {
             _ => (),
         };
 
-        let mut names: Vec<String> = vec![];
-        names.push(
+        let mut names: VecDeque<String> = VecDeque::new();
+        names.push_front(
             node.get_name(&doc.content)
                 .ok_or(anyhow!("Unable to get node name"))?,
         );
@@ -70,7 +73,7 @@ impl Completion for NixCompletion {
             current_node = get_prev_node(prev_node);
             match NodeType::from(prev_node) {
                 NodeType::Identifier => {
-                    names.push(
+                    names.push_front(
                         prev_node
                             .get_name(&doc.content)
                             .ok_or(anyhow!("Unable to get node name"))?,
@@ -85,29 +88,39 @@ impl Completion for NixCompletion {
             }
         }
 
-        let first_name = names.pop().ok_or(anyhow!("empty"))?;
+        let first_name = names.pop_front().ok_or(anyhow!("empty"))?;
         match first_name.as_str() {
-            "inputs" => names.push("inputs".into()),
+            "lib" => {
+                names.extend(
+                    "inputs.nixpkgs.legacyPackages.x86_64-linux.lib"
+                        .split(".")
+                        .map(|s| s.to_string()),
+                );
+            }
+            "inputs" => names.push_front("inputs".into()),
             "inputs'" => {
-                names.push("inputs".into());
+                names.push_front("inputs".into());
                 // Map inputs' to inputs.<flake>.<output>.${system}
                 if names.len() >= 3 {
-                    names.insert(names.len() - 3, "x86_64-linux".into());
+                    names.insert(3, "x86_64-linux".into());
                 }
             }
             "self" => (),
             "self'" => {
                 // Map self' to self.<second>.${system}
                 if !names.is_empty() {
-                    names.insert(names.len() - 1, "x86_64-linux".into());
+                    names.insert(1, "x86_64-linux".into());
                 }
             }
             _ => return Err(anyhow!("Unsupported variable {}", first_name)),
         };
-        names.reverse();
         log::debug!("Getting flake values for {}.{:?}", first_name, names);
 
-        let vals = self.flake_cache.write().unwrap().get_flake_values(&names)?;
+        let vals = self
+            .flake_cache
+            .write()
+            .unwrap()
+            .get_flake_values(names.make_contiguous())?;
         let items = vals
             .iter()
             .map(|val| CompletionItem {
