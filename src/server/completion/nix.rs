@@ -5,9 +5,13 @@ use std::{
 
 use anyhow::anyhow;
 use jsonnet_location::Location;
-use language_server::{cache::Cache, completion::Completion, utils::cst::CstNodeHelper};
+use language_server::{
+    cache::Cache,
+    completion::{Completion, CompletionContext},
+};
 use lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
 use tree_sitter::Node;
+use utils::cst::CstNodeHelper;
 
 use crate::server::{
     NixASTGenerator,
@@ -35,11 +39,11 @@ fn get_prev_node(node: Node) -> Option<Node> {
 impl Completion for NixCompletion {
     fn complete(
         &self,
-        location: lsp_types::Position,
-        uri: &lsp_types::Uri,
+        context: &CompletionContext,
     ) -> language_server::completion::CompletionResult {
-        let doc = self.cache.get_document(uri)?;
-        let pos: Location = location.into();
+        let doc = self.cache.get_document(&context.uri)?;
+        let pos: Location = context.location.clone();
+        // TODO: Use the cache
         let tree = new_tree(&doc.content).ok_or(anyhow!("Unable to generate tree"))?;
         let root_node = tree.root_node();
         let mut node = root_node

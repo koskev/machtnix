@@ -4,22 +4,21 @@ pub mod flake_cache;
 
 use std::sync::{Arc, RwLock};
 
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use jsonnet_location::{Location, LocationRange};
 use language_server::{
     cache::{ASTGenerator, ASTNode, Cache},
-    completion::Completion,
+    completion::{Completion, CompletionContext},
     server::{LSPConnection, LSPError, LSPResponse, LSPServer},
-    utils::{UriHelper, rope::RopeHelper},
 };
 use lsp_types::{
     CompletionOptions, CompletionParams, CompletionResponse, DidSaveTextDocumentParams,
-    InitializeParams, ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind,
-    TextDocumentSyncOptions, Uri,
+    InitializeParams, PositionEncodingKind, ServerCapabilities, TextDocumentSyncCapability,
+    TextDocumentSyncKind, TextDocumentSyncOptions, Uri,
 };
 use rnix::{NixLanguage, SyntaxNode};
 use rowan::{GreenNode, ast::SyntaxNodePtr};
-use utils::RwLockPanic;
+use utils::{RwLockPanic, rope::RopeHelper, uri::UriHelper};
 
 use crate::server::{completion::nix::NixCompletion, flake_cache::FlakeCache};
 
@@ -129,12 +128,35 @@ fn print_child_pos(node: SyntaxNode) {
     }
 }
 
+impl NixLSPServer {
+    fn get_encoding(&self) -> PositionEncodingKind {
+        self.get_capabilities()
+            .position_encoding
+            .unwrap_or(PositionEncodingKind::UTF16)
+    }
+}
+
 impl ASTGenerator for NixASTGenerator {
     type Node = NixASTNode;
     fn update_ast(&self, _source_file: &str, new_content: &str) -> Result<Arc<Self::Node>> {
         let parse = rnix::Root::parse(new_content).syntax();
         print_child_pos(parse.clone());
         Ok(Arc::new(parse.into()))
+    }
+
+    fn update_cst(
+        &self,
+        new_content: &str,
+        old_tree: Option<&tree_sitter::Tree>,
+    ) -> Result<tree_sitter::Tree> {
+        let mut parser = tree_sitter::Parser::new();
+        parser
+            .set_language(&tree_sitter_nix::LANGUAGE.into())
+            .expect("Something is really wrong with the tresitter setup!");
+
+        parser
+            .parse(new_content, old_tree)
+            .ok_or(anyhow!("unable to parse CST"))
     }
 }
 
@@ -187,10 +209,11 @@ impl LSPServer for NixLSPServer {
             cache: self.cache.clone(),
             flake_cache: self.flake_cache.clone().unwrap(),
         }
-        .complete(
-            params.text_document_position.position,
-            &params.text_document_position.text_document.uri,
-        )?;
+        .complete(&CompletionContext {
+            location: params.text_document_position.position.into(),
+            uri: params.text_document_position.text_document.uri.clone(),
+            encoding: self.get_encoding(),
+        })?;
 
         Ok(CompletionResponse::List(list).into())
     }

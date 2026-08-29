@@ -68,23 +68,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c"
 
 [[package]]
-name = "bincode"
-version = "2.0.1"
+name = "bincode-next"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36eaf5d7b090263e8150820482d5d93cd964a81e4019913c972f4edcc6edb740"
+checksum = "dbe9e7e6d14aeb39557f226bff158a30e367fac279d0e69b8b42fb41999f9a86"
 dependencies = [
- "bincode_derive",
+ "bincode_derive-next",
  "serde",
- "unty",
+ "unty-next",
 ]
 
 [[package]]
-name = "bincode_derive"
-version = "2.0.1"
+name = "bincode_derive-next"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf95709a440f45e986983918d0e8a1f30a9b1df04918fc828670606804ac3c09"
+checksum = "2af389a025376dbbe728c43dfa5c08f866116c0b62627787c21ca1c69e2b8dec"
 dependencies = [
- "virtue",
+ "virtue-next",
 ]
 
 [[package]]
@@ -121,6 +121,16 @@ name = "bitflags"
 version = "2.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "843867be96c8daad0d758b57df9392b6d8d271134fce549de6ce169ff98a92af"
+
+[[package]]
+name = "bstr"
+version = "1.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6bb31b46c14244e20ee9984b11bf5c992b91fb6939fea616e3512c8baecdbe5f"
+dependencies = [
+ "memchr",
+ "serde_core",
+]
 
 [[package]]
 name = "cc"
@@ -606,25 +616,27 @@ dependencies = [
 [[package]]
 name = "jsonnet-location"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#856a181329719922329f3ce802444d6720135fc2"
+source = "git+https://github.com/koskev/grustonnet-ls#e27b78b128dc0218db5fab0ab8975166eb721966"
 dependencies = [
  "anyhow",
- "bincode",
- "language-server",
+ "bincode-next",
  "lsp-types",
+ "ropey",
  "serde",
  "tree-sitter",
+ "utils",
 ]
 
 [[package]]
 name = "language-server"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#856a181329719922329f3ce802444d6720135fc2"
+source = "git+https://github.com/koskev/grustonnet-ls#e27b78b128dc0218db5fab0ab8975166eb721966"
 dependencies = [
  "anyhow",
  "crossbeam",
+ "jsonnet-location",
  "log",
- "lsp-server",
+ "lsp-server 0.10.0",
  "lsp-types",
  "mockall",
  "pretty_assertions",
@@ -635,7 +647,6 @@ dependencies = [
  "serde_json",
  "similar",
  "tree-sitter",
- "url",
  "utils",
 ]
 
@@ -711,6 +722,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "lsp-server"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3ee25a31f2e571e426eef2896179450cafc7e2f5be00d8a93b1c2d21c0ff7656"
+dependencies = [
+ "crossbeam-channel",
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
 name = "lsp-types"
 version = "0.97.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -732,7 +756,7 @@ dependencies = [
  "jsonnet-location",
  "language-server",
  "log",
- "lsp-server",
+ "lsp-server 0.7.9",
  "lsp-types",
  "nix-bindings-expr",
  "nix-bindings-fetchers",
@@ -762,9 +786,9 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "mockall"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f58d964098a5f9c6b63d0798e5372fd04708193510a7af313c22e9f29b7b620b"
+checksum = "1a6ceddfe3ce334925e96bf420fdb2dcee5bed6c632a168ece622676dadeaf8a"
 dependencies = [
  "cfg-if",
  "downcast",
@@ -776,9 +800,9 @@ dependencies = [
 
 [[package]]
 name = "mockall_derive"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca41ce716dda6a9be188b385aa78ee5260fc25cd3802cb2a8afdc6afbe6b6dbf"
+checksum = "9cfe16fbe8a314aeec0b861ac24e60b1e123e97634bab045475b9d6a18416fd8"
 dependencies = [
  "cfg-if",
  "proc-macro2",
@@ -923,7 +947,7 @@ dependencies = [
 [[package]]
 name = "node-stack"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#856a181329719922329f3ce802444d6720135fc2"
+source = "git+https://github.com/koskev/grustonnet-ls#e27b78b128dc0218db5fab0ab8975166eb721966"
 dependencies = [
  "language-server",
 ]
@@ -949,6 +973,33 @@ name = "once_cell_polyfill"
 version = "1.70.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
+
+[[package]]
+name = "path-absolutize"
+version = "3.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e4af381fe79fa195b4909485d99f73a80792331df0625188e707854f0b3383f5"
+dependencies = [
+ "path-dedot",
+]
+
+[[package]]
+name = "path-calculate"
+version = "0.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4690055139867a4a0d11d18ab98d80b325d7aa573b99e0ae8e1bc787a4282da7"
+dependencies = [
+ "path-absolutize",
+]
+
+[[package]]
+name = "path-dedot"
+version = "3.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "07ba0ad7e047712414213ff67533e6dd477af0a4e1d14fb52343e53d30ea9397"
+dependencies = [
+ "once_cell",
+]
 
 [[package]]
 name = "percent-encoding"
@@ -1254,9 +1305,12 @@ checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
 name = "similar"
-version = "2.7.0"
+version = "3.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbbb5d9659141646ae647b42fe094daf6c6192d1620870b449d9557f748b2daa"
+checksum = "4f66ca1f7aca2474dc10c942eb22feffc897735f54cd1db90138c2fddb490987"
+dependencies = [
+ "bstr",
+]
 
 [[package]]
 name = "smallvec"
@@ -1382,10 +1436,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
 
 [[package]]
-name = "unty"
-version = "0.0.4"
+name = "unty-next"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d49784317cd0d1ee7ec5c716dd598ec5b4483ea832a2dced265471cc0f690ae"
+checksum = "16062d030850f35054e37746427b9febb74a2f24c9c6dd6fa2d0c13c5f53221e"
 
 [[package]]
 name = "url"
@@ -1414,16 +1468,24 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 [[package]]
 name = "utils"
 version = "0.1.0"
-source = "git+https://github.com/koskev/grustonnet-ls#856a181329719922329f3ce802444d6720135fc2"
+source = "git+https://github.com/koskev/grustonnet-ls#e27b78b128dc0218db5fab0ab8975166eb721966"
 dependencies = [
+ "anyhow",
  "dunce",
+ "log",
+ "lsp-types",
+ "path-calculate",
+ "pretty_assertions",
+ "ropey",
+ "tree-sitter",
+ "url",
 ]
 
 [[package]]
-name = "virtue"
-version = "0.0.18"
+name = "virtue-next"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "051eb1abcf10076295e815102942cc58f9d5e3b4560e46e53c21e8ff6f3af7b1"
+checksum = "8d5208a9710a6ca1c2da0d64289a5dcca13deb05afdedf651f4e11bcd9fc53eb"
 
 [[package]]
 name = "wasip2"
